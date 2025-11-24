@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // 'customer' or 'provider'
     ];
 
     /**
@@ -44,5 +45,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relationships
+     */
+    
+    // If the user is a customer, they have many appointments
+    public function appointmentsAsCustomer()
+    {
+        return $this->hasMany(\App\Models\Appointment::class, 'user_id');
+    }
+
+    // If the user is a provider, they have many appointments
+    public function appointmentsAsProvider()
+    {
+        return $this->hasMany(\App\Models\Appointment::class, 'provider_id');
     }
 }
