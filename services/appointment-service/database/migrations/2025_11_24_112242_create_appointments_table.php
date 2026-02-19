@@ -13,7 +13,25 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+
+            // store authoritative IDs (from User Service)
+            $table->unsignedBigInteger('user_id')->index();     // customer (original ID)
+            $table->unsignedBigInteger('provider_id')->nullable()->index(); // prov`ider (original ID)
+
+            // appointment details
+            $table->string('title');
+            $table->text('notes')->nullable();
+
+            $table->dateTime('start_at')->index();
+            $table->dateTime('end_at')->nullable();
+
+            $table->enum('status', ['scheduled', 'cancelled', 'completed'])
+                ->default('scheduled')
+                ->index();
+
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 
