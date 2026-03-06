@@ -37,4 +37,43 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
+    function countSubarraysWithSumAndMaxAtMost($nums, $k, $M) {
+    $count = 0;
+    $currentSum = 0;
+    // Map to store frequency of prefix sums. 
+    // We start with 0 => 1 because a sum of 0 has "occurred" once at the start.
+    $prefixSums = [0 => 1];
+
+    foreach ($nums as $num) {
+        if ($num > $M) {
+            // Barrier hit: Reset everything for the next contiguous segment
+            $currentSum = 0;
+            $prefixSums = [0 => 1];
+            continue;
+        }
+
+        $currentSum += $num;
+        
+        // If (currentSum - k) exists in our map, it means there is a 
+        // subarray ending here that sums exactly to k.
+        $target = $currentSum - $k;
+        if (isset($prefixSums[$target])) {
+            $count += $prefixSums[$target];
+        }
+
+        // Record this current sum in the map
+        $prefixSums[$currentSum] = ($prefixSums[$currentSum] ?? 0) + 1;
+    }
+
+    return $count;
 }
+Input: nums = [2, 1, -1, 2], k = 2, M = 2
+}
+[1, 2, 1]
+
+[1]
+[1,2]
+[1,2,1]
+[2]
+[2,1]
+[1]

@@ -2,37 +2,13 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
-class UserCreated implements ShouldBroadcast
+class UserCreated
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    /**
-     * Create a new event instance.
-     */
-    public function __construct(
-        public $id,
-        public $name,
-        public $email,
-        public $role
-    ) {}
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
-    public function broadcastOn(): array
+    public function __construct(public User $user) 
     {
-        return [
-            new PrivateChannel('channel-name'),
-        ];
+        Log::info('UserCreated event triggered');
     }
 }
