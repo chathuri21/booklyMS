@@ -37,4 +37,28 @@ class UserTest extends TestCase
         $this->assertNotEquals('plaintextpassword', $user->password);
         $this->assertTrue(password_verify('plaintextpassword', $user->password));
     }
+
+    public function test_user_role_is_valid(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'customer',
+        ]);
+
+        $this->assertEquals('customer', $user->role);
+
+        $user = User::factory()->create([
+            'role' => 'provider',
+        ]);
+
+        $this->assertEquals('provider', $user->role);
+    }
+
+    public function test_password_is_hidden_from_array(): void
+    {
+        $user = User::factory()->create();
+
+        $userArray = $user->toArray();
+
+        $this->assertArrayNotHasKey('password', $userArray);
+    }
 }
