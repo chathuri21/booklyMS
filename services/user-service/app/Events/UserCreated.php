@@ -3,12 +3,15 @@
 namespace App\Events;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use App\Domain\Services\LoggerInterface;
 
 class UserCreated
 {
-    public function __construct(public User $user) 
+    public function __construct(
+        public User $user,
+        private LoggerInterface $logger
+    ) 
     {
-        Log::info('UserCreated event triggered');
+        $this->logger->info('UserCreated event triggered');
     }
 }
