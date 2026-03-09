@@ -3,6 +3,7 @@
 namespace App\Application\Services;
 
 use App\Domain\DTOs\RegisterUserDTO;
+use App\Domain\Exceptions\UserAlreadyExistsException;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\EventDispatcherInterface;
 use App\Domain\Services\LoggerInterface;
@@ -23,6 +24,13 @@ class RegisterUserService
 
     public function execute(RegisterUserDTO $dto): array
     {
+        $existingUser = $this->userRepository->findByEmail($dto->email);
+
+        if ($existingUser) {
+            $this->logger->info('Registration attempt with existing email: ' . $dto->email);
+            throw new UserAlreadyExistsException();
+        }
+
         $user = $this->userRepository->create($dto);
   
         $token = $this->tokenService->generateToken($user);
@@ -31,10 +39,8 @@ class RegisterUserService
         $this->eventDispatcher->dispatch(new UserCreated($user, $this->logger));
 
         return [
-            'message' => 'User registered successfully',
             'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+            'access_token' => $token
         ];
     }
 }

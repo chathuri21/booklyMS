@@ -9,6 +9,7 @@ use App\Domain\DTOs\LoginUserDTO;
 use App\Domain\DTOs\RegisterUserDTO;
 use App\Domain\Exceptions\InactiveAccountException;
 use App\Domain\Exceptions\InvalidCredentialsException;
+use App\Domain\Exceptions\UserAlreadyExistsException;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
@@ -19,9 +20,22 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request, RegisterUserService $service)
     {
-        $result = $service->execute(RegisterUserDTO::fromRequest($request->validated()));
+        try {
+            $result = $service->execute(RegisterUserDTO::fromRequest($request->validated()));
 
-        return response()->json($result, 201);
+            return response()->json([
+                'message' => 'User registered successfully',
+                'data' => [
+                    new UserResource($result['user']),
+                    'access_token' => $result['access_token'],
+                    'token_type' => 'Bearer'
+                ],
+            ], 201);
+        } catch (UserAlreadyExistsException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }   
     }
 
     public function login(LoginRequest $request, LoginUserService $service)
@@ -32,9 +46,11 @@ class AuthController extends Controller
             $result = $service->execute($dto);
             return response()->json([
                 'message' => 'Login successful',
-                'user' => new UserResource($result['user']),
-                'access_token' => $result['access_token'],
-                'token_type' => 'Bearer'
+                'data' => [
+                    'user' => new UserResource($result['user']),
+                    'access_token' => $result['access_token'],
+                    'token_type' => 'Bearer'
+                ]
             ], 200);
         } catch(InvalidCredentialsException $e) {
             return response()->json(['message' => 'Invalid credentials'], 401);
