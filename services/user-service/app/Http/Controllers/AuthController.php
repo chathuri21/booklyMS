@@ -20,22 +20,16 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request, RegisterUserService $service)
     {
-        try {
-            $result = $service->execute(RegisterUserDTO::fromRequest($request->validated()));
+        $result = $service->execute(RegisterUserDTO::fromRequest($request->validated()));
 
-            return response()->json([
-                'message' => 'User registered successfully',
-                'data' => [
-                    new UserResource($result['user']),
-                    'access_token' => $result['access_token'],
-                    'token_type' => 'Bearer'
-                ],
-            ], 201);
-        } catch (UserAlreadyExistsException $e) {
-            return response()->json(['message' => $e->getMessage()], 409);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }   
+        return response()->json([
+            'message' => 'User registered successfully',
+            'data' => [
+                new UserResource($result['user']),
+                'access_token' => $result['access_token'],
+                'token_type' => 'Bearer'
+            ],
+        ], 201);
     }
 
     public function login(LoginRequest $request, LoginUserService $service)
