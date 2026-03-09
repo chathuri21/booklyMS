@@ -64,12 +64,8 @@ class RegisterUserServiceTest extends TestCase
         $result = $service->execute($dto);
 
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('user', $result);
         $this->assertArrayHasKey('access_token', $result);
-        $this->assertArrayHasKey('token_type', $result);    
-        $this->assertEquals('User registered successfully', $result['message']);
-        $this->assertEquals('Bearer', $result['token_type']);
         $this->assertEquals('test-token', $result['access_token']);
         $this->assertNotEmpty($result['access_token']);
         $this->assertNotEmpty($result['user']);

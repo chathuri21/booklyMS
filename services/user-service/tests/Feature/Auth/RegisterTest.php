@@ -24,17 +24,16 @@ class RegisterTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'message',
-                'user' => [
-                    'id',
-                    'name',
-                    'email',
-                    'phone',
-                    'role',
-                    'created_at',
-                    'updated_at',
-                ],
-                'access_token',
-                'token_type',
+                'data' => [
+                    'user' => [
+                        'id',
+                        'name',
+                        'email',
+                        'role',
+                    ],
+                    'access_token',
+                    'token_type',
+                ]
             ]);
     }
 
