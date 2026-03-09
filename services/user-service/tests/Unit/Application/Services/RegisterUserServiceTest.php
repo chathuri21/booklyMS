@@ -55,9 +55,9 @@ class RegisterUserServiceTest extends TestCase
 
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );
 
@@ -110,9 +110,9 @@ class RegisterUserServiceTest extends TestCase
             ->willReturn($user);
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );
         
@@ -139,9 +139,9 @@ class RegisterUserServiceTest extends TestCase
             ->willReturn('test-token');
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );
 
@@ -169,9 +169,9 @@ class RegisterUserServiceTest extends TestCase
             ->with($this->isInstanceOf(UserCreated::class));    
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );
 
@@ -207,9 +207,9 @@ class RegisterUserServiceTest extends TestCase
             }));
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );
         $service->execute($dto);
@@ -237,9 +237,9 @@ class RegisterUserServiceTest extends TestCase
             ->willThrowException(new \Exception('Database error')); 
 
         $service = new RegisterUserService(
-            user: $userRepository,
-            event: $eventDispatcher,
-            token: $tokenService,
+            userRepository: $userRepository,
+            eventDispatcher: $eventDispatcher,
+            tokenService: $tokenService,
             logger: $logger
         );  
 
