@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Events;
+namespace Tests\Integration\Events;
 
 use App\Events\UserCreated;
 use App\Infrastructure\Events\LaravelEventDispatcher;

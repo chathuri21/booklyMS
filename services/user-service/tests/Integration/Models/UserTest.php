@@ -1,10 +1,9 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Integration\Models;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tests\TestCase;
 
 class UserTest extends TestCase

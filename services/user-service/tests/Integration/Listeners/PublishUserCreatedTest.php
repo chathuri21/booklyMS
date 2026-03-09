@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Listeners;
+namespace Tests\Integration\Listeners;
 
 use App\Domain\Services\LoggerInterface;
 use App\Events\UserCreated;

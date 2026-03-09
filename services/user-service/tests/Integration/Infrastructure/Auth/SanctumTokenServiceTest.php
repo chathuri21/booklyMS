@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\Auth;
+namespace Tests\Integration\Infrastructure\Auth;
 
 use App\Domain\Services\TokenServiceInterface;
 use App\Models\User;
