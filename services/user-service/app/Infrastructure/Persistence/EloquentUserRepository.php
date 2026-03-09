@@ -19,4 +19,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             'role' => $dto->role,
         ]);
     }
+
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
+    }
 }
