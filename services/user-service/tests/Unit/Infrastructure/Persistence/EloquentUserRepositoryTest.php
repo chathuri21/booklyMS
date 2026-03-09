@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Infrastructure\EloquentUserRepositoryTest;
+namespace Tests\Unit\Infrastructure\Persistence\EloquentUserRepositoryTest;
 use App\Domain\DTOs\RegisterUserDTO;
 use App\Infrastructure\Persistence\EloquentUserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
