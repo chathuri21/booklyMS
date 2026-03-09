@@ -12,9 +12,9 @@ use App\Events\UserCreated;
 class RegisterUserService
 {
     public function __construct(
-        private UserRepositoryInterface $user,
-        private EventDispatcherInterface $event,
-        private TokenServiceInterface $token,
+        private UserRepositoryInterface $userRepository,
+        private EventDispatcherInterface $eventDispatcher,
+        private TokenServiceInterface $tokenService,
         private LoggerInterface $logger
     )
     {
@@ -23,12 +23,12 @@ class RegisterUserService
 
     public function execute(RegisterUserDTO $dto): array
     {
-        $user = $this->user->create($dto);
+        $user = $this->userRepository->create($dto);
   
-        $token = $this->token->generateToken($user);
+        $token = $this->tokenService->generateToken($user);
 
         $this->logger->info('Dispatching UserCreated event');
-        $this->event->dispatch(new UserCreated($user, $this->logger));
+        $this->eventDispatcher->dispatch(new UserCreated($user, $this->logger));
 
         return [
             'message' => 'User registered successfully',
