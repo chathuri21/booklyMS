@@ -25,7 +25,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User registered successfully',
             'data' => [
-                new UserResource($result['user']),
+                'user' => new UserResource($result['user']),
                 'access_token' => $result['access_token'],
                 'token_type' => 'Bearer'
             ],
@@ -34,24 +34,15 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request, LoginUserService $service)
     {
-        $dto = LoginUserDTO::fromRequest($request->validated());
-
-        try {
-            $result = $service->execute($dto);
-            return response()->json([
-                'message' => 'Login successful',
-                'data' => [
-                    'user' => new UserResource($result['user']),
-                    'access_token' => $result['access_token'],
-                    'token_type' => 'Bearer'
-                ]
-            ], 200);
-        } catch(InvalidCredentialsException $e) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        } catch (InactiveAccountException $e) {
-            return response()->json(['message' => 'User account is inactive'], 403);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
-        }
+        $result = $service->execute(LoginUserDTO::fromRequest($request->validated()));
+            
+        return response()->json([
+            'message' => 'Login successful',
+            'data' => [
+                'user' => new UserResource($result['user']),
+                'access_token' => $result['access_token'],
+                'token_type' => 'Bearer'
+            ]
+        ], 200);
     }
 }
