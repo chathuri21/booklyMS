@@ -3,10 +3,11 @@
 namespace App\Application\Services;
 
 use App\Domain\DTOs\LoginUserDTO;
+use App\Domain\Exceptions\InvalidCredentialsException;
+use App\Domain\Exceptions\InactiveAccountException;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\TokenServiceInterface;
 use App\Domain\Services\LoggerInterface;
-use Exception;
 
 class LoginUserService
 {
@@ -25,12 +26,12 @@ class LoginUserService
 
         if (!$user || !password_verify($dto->password, $user->password)) {
             $this->logger->info('Invalid login attempt for email: ' . $dto->email);
-            throw new Exception('Invalid credentials', 401);
+            throw new InvalidCredentialsException();
         }
 
         if (!$user->is_active) {
             $this->logger->info('Inactive account login attempt for email: ' . $dto->email);
-            throw new Exception('User account is inactive', 403);
+            throw new InactiveAccountException();
         } 
 
         $token = $this->tokenService->generateToken($user);
