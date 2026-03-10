@@ -14,24 +14,34 @@ use PHPUnit\Framework\TestCase;
 
 class RegisterUserServiceTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     */
-    public function test_register_returns_expected_structure(): void
+    protected LoggerInterface $logger;
+    protected UserRepositoryInterface $userRepository;
+    protected TokenServiceInterface $tokenService;
+    protected EventDispatcherInterface $eventDispatcher;   
+
+    protected function setUp(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
+        parent::setUp();
+
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->userRepository = $this->createMock(UserRepositoryInterface::class);
+        $this->tokenService = $this->createMock(TokenServiceInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+    }
+
+    private function makeDTO(): RegisterUserDTO
+    {
+        return new RegisterUserDTO(
             name: 'Test User',
             email: 'test@example.com',
             phone: '1234567890',
             password: 'password',
             role: 'customer'
         );
+    }
 
+    private function makeUser(): User
+    {
         $user = new User([
             'id' => 1,
             'name' => 'Test User',
@@ -40,28 +50,31 @@ class RegisterUserServiceTest extends TestCase
             'role' => 'customer'
         ]);
 
-        $userRepository->expects($this->once())
-            ->method('create')
-            ->with($dto)
-            ->willReturn($user);
+        $user->id = 1;
+        return $user;
+    }
 
-        $tokenService->expects($this->once())
-            ->method('generateToken')
-            ->willReturn('test-token');
-
-        $eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with($this->isInstanceOf(UserCreated::class));
-
-
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
+    private function makeService(): RegisterUserService
+    {
+        return new RegisterUserService(
+            userRepository: $this->userRepository,
+            eventDispatcher: $this->eventDispatcher,
+            tokenService: $this->tokenService,
+            logger: $this->logger
         );
+    }
 
-        $result = $service->execute($dto);
+    /**
+     * A basic unit test example.
+     */
+    public function test_register_returns_expected_structure(): void
+    {
+        $this->userRepository->method('create')->willReturn($this->makeUser());
+        $this->tokenService->method('generateToken')->willReturn('test-token');
+        $this->eventDispatcher->method('dispatch');
+
+        $service = $this->makeService();
+        $result = $service->execute($this->makeDTO());
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('user', $result);
@@ -79,169 +92,86 @@ class RegisterUserServiceTest extends TestCase
 
     public function test_repository_create_is_called(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
+        $dto = $this->makeDTO();
 
-        $user = new User([
-            'id' => 1,
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'phone' => '1234567890',
-            'role' => 'customer'
-        ]);
-
-        $userRepository->expects($this->once())
+        $this->userRepository->expects($this->once())
             ->method('create')
             ->with($dto)
-            ->willReturn($user);
+            ->willReturn($this->makeUser());
 
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
-        );
-        
-        $result = $service->execute($dto);
+        $this->tokenService->method('generateToken')->willReturn('test-token');
+        $this->eventDispatcher->method('dispatch');
+
+        $service = $this->makeService();    
+        $service->execute($dto);
     }
 
     public function test_register_generates_token_on_success(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
+        $user = $this->makeUser();
 
-        $tokenService->expects($this->once())
+        $this->userRepository->expects($this->once())->method('create')->willReturn($user);
+
+        $this->tokenService->expects($this->once())
             ->method('generateToken')
+            ->with($user)
             ->willReturn('test-token');
 
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
-        );
+        $this->eventDispatcher->method('dispatch');
 
-        $result = $service->execute($dto);
+        $service = $this->makeService();
+        $result = $service->execute($this->makeDTO());
+
         $this->assertEquals('test-token', $result['access_token']);
     }
 
     public function test_register_dispatches_event_on_success(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
+        $this->userRepository->method('create')->willReturn($this->makeUser());
+        $this->tokenService->method('generateToken')->willReturn('test-token');
 
-        $eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(UserCreated::class));    
+            ->with($this->isInstanceOf(UserCreated::class)); 
 
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
-        );
-
-        $service->execute($dto);
+        $this->makeService()->execute($this->makeDTO());
     }
+
     public function test_user_created_event_contains_correct_user(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
+        $user = $this->makeUser();
 
-        $user = new User([
-            'id' => 1,
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'phone' => '1234567890',
-            'role' => 'customer'
-        ]);
+        $this->userRepository->method('create')->willReturn($user);
+        $this->tokenService->method('generateToken')->willReturn('test-token');
 
-        $eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($this->callback(function ($event) use ($user) {
-                return $event instanceof UserCreated && $event->user->id === $user->id;
+                return $event instanceof UserCreated && $event->user->email === $user->email;
             }));
 
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
-        );
-        $service->execute($dto);
+        $service = $this->makeService();
+        $service->execute($this->makeDTO());
 
     }
 
     public function test_register_throws_exception_on_failure(): void
     {
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $tokenService = $this->createMock(TokenServiceInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-    
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
+        $dto = $this->makeDTO();
 
-        $userRepository->expects($this->once())
+        $this->userRepository->expects($this->once())
             ->method('create')
             ->with($dto)
             ->willThrowException(new \Exception('Database error')); 
+        
+        $this->tokenService->expects($this->never())->method('generateToken');
 
-        $service = new RegisterUserService(
-            userRepository: $userRepository,
-            eventDispatcher: $eventDispatcher,
-            tokenService: $tokenService,
-            logger: $logger
-        );  
+        $this->eventDispatcher->expects($this->never())->method('dispatch');
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database error');    
 
+        $service = $this->makeService();
         $service->execute($dto);
     }
 }
