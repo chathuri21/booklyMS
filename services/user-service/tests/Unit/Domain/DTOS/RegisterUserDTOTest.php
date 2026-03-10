@@ -3,7 +3,7 @@
 namespace Tests\Unit\Domain\DTOs;
 
 use App\Domain\DTOs\RegisterUserDTO;
-use Tests\TestCase; 
+use PHPUnit\Framework\TestCase;
 
 class RegisterUserDTOTest extends TestCase
 {
