@@ -36,7 +36,7 @@ class RegisterUserService
         $token = $this->tokenService->generateToken($user);
 
         $this->logger->info('Dispatching UserCreated event');
-        $this->eventDispatcher->dispatch(new UserCreated($user, $this->logger));
+        $this->eventDispatcher->dispatch(new UserCreated($user));
 
         return [
             'user' => $user,
