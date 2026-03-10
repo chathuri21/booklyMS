@@ -6,7 +6,9 @@ use App\Domain\Services\LoggerInterface;
 use App\Events\UserCreated;
 use App\Listeners\PublishUserCreated;
 use App\Models\User;
+use App\Jobs\PublishUserCreatedJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class PublishUserCreatedTest extends TestCase
@@ -15,6 +17,8 @@ class PublishUserCreatedTest extends TestCase
 
     public function test_listener_handles_event(): void
     {
+        Queue::fake();
+
         $loggerMock = $this->createMock(LoggerInterface::class);
 
         $user = User::factory()->create();
@@ -23,7 +27,10 @@ class PublishUserCreatedTest extends TestCase
 
         $listener = new PublishUserCreated($loggerMock);
         $listener->handle($event);
-        
-        $this->assertTrue(true);
+
+        Queue::assertPushed(PublishUserCreatedJob::class, function ($job) use ($user) {
+            return str_contains($job->payload, 'user.created') && str_contains($job->payload, (string) $user->id);
+        });
+
     }
 }
