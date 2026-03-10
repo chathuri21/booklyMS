@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Domain\Services\LoggerInterface;
 use App\Events\UserCreated;
 use App\Jobs\PublishUserCreatedJob;
-use Illuminate\Support\Facades\Queue;
 
 class PublishUserCreated
 {
