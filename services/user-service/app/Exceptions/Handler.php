@@ -16,7 +16,7 @@ class Handler extends Exception
         if ($e instanceof UserAlreadyExistsException || $e instanceof InvalidCredentialsException || $e instanceof InactiveAccountException) {
             return response()->json([
                 'message' => $e->getMessage(),
-            ], 409);
+            ], $e->getCode() ?: 409);
         }
 
         return response()->json([
