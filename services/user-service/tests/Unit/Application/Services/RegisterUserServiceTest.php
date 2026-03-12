@@ -42,16 +42,13 @@ class RegisterUserServiceTest extends TestCase
 
     private function makeUser(): User
     {
-        $user = new User([
+        return new User([
             'id' => 1,
             'name' => 'Test User',
             'email' => 'test@example.com',
             'phone' => '1234567890',
             'role' => 'customer'
         ]);
-
-        $user->id = 1;
-        return $user;
     }
 
     private function makeService(): RegisterUserService
