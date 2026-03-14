@@ -19,7 +19,7 @@ class RegisterUserDTO
             email: $data['email'],
             phone: $data['phone'] ?? '',
             password: $data['password'],
-            role: $data['role'] ?? 'customer',
+            role: $data['role'] ?? 'customer'
         );
     }
 }
