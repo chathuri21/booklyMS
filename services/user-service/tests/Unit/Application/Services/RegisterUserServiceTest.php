@@ -3,7 +3,7 @@
 namespace Tests\Unit\Application\Services;
 
 use App\Domain\DTOs\RegisterUserDTO;
-use App\Models\User;
+use App\Domain\Entities\User;
 use App\Application\Services\RegisterUserService;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\EventDispatcherInterface;
@@ -42,13 +42,16 @@ class RegisterUserServiceTest extends TestCase
 
     private function makeUser(): User
     {
-        return new User([
-            'id' => 1,
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'phone' => '1234567890',
-            'role' => 'customer'
-        ]);
+        return new User(
+            id: 1,
+            name: 'Test User',
+            email: 'test@example.com',
+            phone: '1234567890',
+            password: password_hash('password', PASSWORD_BCRYPT),
+            role: 'customer',
+            isActive: true,
+            eloquentUser: null
+        );
     }
 
     private function makeService(): RegisterUserService
