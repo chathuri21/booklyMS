@@ -3,25 +3,35 @@
 namespace App\Infrastructure\Persistence;
 
 use App\Domain\DTOs\RegisterUserDTO;
+use App\Domain\Entities\User as DomainUser;
 use App\Domain\Repositories\UserRepositoryInterface;
-use App\Models\User;
+use App\Models\User as EloquentUser;
+use App\Infrastructure\EloquentUserMapper;
 use Illuminate\Support\Facades\Hash;
 
 class EloquentUserRepository implements UserRepositoryInterface
 {
-    public function create(RegisterUserDTO $dto): User
+    public function create(RegisterUserDTO $dto): DomainUser
     {
-        return User::create([
+        $eloquentUser = EloquentUser::create([
             'name' => $dto->name,
             'email' => $dto->email,
             'phone' => $dto->phone,
             'password' => Hash::make($dto->password),
             'role' => $dto->role,
         ]);
+
+        return EloquentUserMapper::toDomain($eloquentUser);
     }
 
-    public function findByEmail(string $email): ?User
+    public function findByEmail(string $email): ?DomainUser
     {
-        return User::where('email', $email)->first();
+        $eloquentUser = EloquentUser::where('email', $email)->first();
+
+        if (!$eloquentUser) {
+            return null;
+        }
+
+        return EloquentUserMapper::toDomain($eloquentUser);
     }
 }
