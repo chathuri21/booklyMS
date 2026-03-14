@@ -7,14 +7,9 @@ use App\Application\Services\LoginUserService;
 use App\Application\Services\RegisterUserService;
 use App\Domain\DTOs\LoginUserDTO;
 use App\Domain\DTOs\RegisterUserDTO;
-use App\Domain\Exceptions\InactiveAccountException;
-use App\Domain\Exceptions\InvalidCredentialsException;
-use App\Domain\Exceptions\UserAlreadyExistsException;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use Exception;
-
 
 class AuthController extends Controller
 {
