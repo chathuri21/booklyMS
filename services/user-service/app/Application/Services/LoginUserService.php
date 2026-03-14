@@ -29,7 +29,7 @@ class LoginUserService
             throw new InvalidCredentialsException();
         }
 
-        if (!$user->is_active) {
+        if (!$user->isActive) {
             $this->logger->info('Inactive account login attempt for email: ' . $dto->email);
             throw new InactiveAccountException();
         } 
