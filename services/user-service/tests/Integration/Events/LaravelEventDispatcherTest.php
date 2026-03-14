@@ -3,9 +3,9 @@
 namespace Tests\Integration\Events;
 
 use App\Events\UserCreated;
+use App\Infrastructure\EloquentUserMapper;
 use App\Infrastructure\Events\LaravelEventDispatcher;
-use App\Models\User;
-use App\Domain\Services\LoggerInterface;
+use App\Models\User as EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -20,14 +20,13 @@ class LaravelEventDispatcherTest extends TestCase
 
         $dispatcher = new LaravelEventDispatcher();
 
-        $user = User::factory()->create();
+        $eloquentUser = EloquentUser::factory()->create();
+        $domainUser = EloquentUserMapper::toDomain($eloquentUser);
 
-        $loggerMock = $this->createMock(LoggerInterface::class);
-
-        $event = new UserCreated($user, $loggerMock);
+        $event = new UserCreated($domainUser);
 
         $dispatcher->dispatch($event);
 
-        $this->assertTrue(true);
+        Event::assertDispatched(UserCreated::class);
     }
 }

@@ -3,13 +3,13 @@
 namespace App\Infrastructure\Auth;
 
 use App\Domain\Services\TokenServiceInterface;
-use App\Models\User;
-use Laravel\Sanctum\PersonalAccessToken;
+use App\Domain\Entities\User;
 
 class SanctumTokenService implements TokenServiceInterface
 {
     public function generateToken(User $user): string
     {
-        return $user->createToken('auth_token')->plainTextToken;
+        $eloquentUser = $user->getEloquentModel();
+        return $eloquentUser->createToken('auth_token')->plainTextToken;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Domain\Repositories;
 
 use App\Domain\DTOs\RegisterUserDTO;
-use App\Models\User;
+use App\Domain\Entities\User;
 
 interface UserRepositoryInterface
 {

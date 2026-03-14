@@ -22,6 +22,6 @@ class PublishUserCreated
 
         $user = $event->user;
         
-        PublishUserCreatedJob::dispatch(json_encode(['event' => 'user.created','data' => $user->toArray()]));
+        PublishUserCreatedJob::dispatch(json_encode(['event' => 'user.created','data' => (array) $user]));
     }
 }
