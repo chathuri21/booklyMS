@@ -171,7 +171,7 @@ class RegisterUserServiceTest extends TestCase
         $this->service->execute($dto);
     }
 
-    public function test_register_throws_exception_when_user_already_exictes() : void 
+    public function test_register_throws_exception_when_user_already_existes() : void 
     {
         $dto = $this->makeDTO();
         $existingUser = $this->makeUser();
