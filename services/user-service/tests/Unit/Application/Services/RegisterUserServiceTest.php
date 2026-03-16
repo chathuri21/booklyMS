@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Application\Services;
 
+use App\Application\Services\RegisterUserService;
 use App\Domain\DTOs\RegisterUserDTO;
 use App\Domain\Entities\User;
-use App\Application\Services\RegisterUserService;
+use App\Domain\Exceptions\UserAlreadyExistsException;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\EventDispatcherInterface;
 use App\Domain\Services\LoggerInterface;
@@ -87,11 +88,12 @@ class RegisterUserServiceTest extends TestCase
     public function test_repository_create_is_called(): void
     {
         $dto = $this->makeDTO();
+        $user = $this->makeUser();
 
         $this->userRepository->expects($this->once())
             ->method('create')
             ->with($dto)
-            ->willReturn($this->makeUser());
+            ->willReturn($user);
 
         $this->tokenService->method('generateToken')->willReturn('test-token');
         $this->eventDispatcher->method('dispatch');
@@ -101,6 +103,7 @@ class RegisterUserServiceTest extends TestCase
 
     public function test_register_generates_token_on_success(): void
     {
+        $dto = $this->makeDTO();
         $user = $this->makeUser();
 
         $this->userRepository->expects($this->once())->method('create')->willReturn($user);
@@ -112,13 +115,15 @@ class RegisterUserServiceTest extends TestCase
 
         $this->eventDispatcher->method('dispatch');
 
-        $result = $this->service->execute($this->makeDTO());
+        $result = $this->service->execute($dto);
 
         $this->assertEquals('test-token', $result['access_token']);
     }
 
     public function test_register_dispatches_event_on_success(): void
     {
+        $dto = $this->makeDTO();
+
         $this->userRepository->method('create')->willReturn($this->makeUser());
         $this->tokenService->method('generateToken')->willReturn('test-token');
 
@@ -126,11 +131,12 @@ class RegisterUserServiceTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(UserCreated::class)); 
 
-        $this->service->execute($this->makeDTO());
+        $this->service->execute($dto);
     }
 
     public function test_user_created_event_contains_correct_user(): void
     {
+        $dto = $this->makeDTO();
         $user = $this->makeUser();
 
         $this->userRepository->method('create')->willReturn($user);
@@ -142,7 +148,7 @@ class RegisterUserServiceTest extends TestCase
                 return $event instanceof UserCreated && $event->user->email === $user->email;
             }));
 
-        $this->service->execute($this->makeDTO());
+        $this->service->execute($dto);
 
     }
 
@@ -162,6 +168,27 @@ class RegisterUserServiceTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database error');    
 
+        $this->service->execute($dto);
+    }
+
+    public function test_register_throws_exception_when_user_already_exictes() : void 
+    {
+        $dto = $this->makeDTO();
+        $existingUser = $this->makeUser();
+
+        $this->userRepository->expects($this->once())
+            ->method('findByEmail')
+            ->with($dto->email)
+            ->willReturn($existingUser);
+            
+        $this->userRepository->expects($this->never())->method('create');
+
+        $this->tokenService->expects($this->never())->method('generateToken');
+
+        $this->eventDispatcher->expects($this->never())->method('dispatch');
+
+        $this->expectException(UserAlreadyExistsException::class);
+        
         $this->service->execute($dto);
     }
 }
