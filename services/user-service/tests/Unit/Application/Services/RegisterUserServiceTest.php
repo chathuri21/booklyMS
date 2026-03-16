@@ -18,6 +18,7 @@ class RegisterUserServiceTest extends TestCase
     protected UserRepositoryInterface $userRepository;
     protected TokenServiceInterface $tokenService;
     protected EventDispatcherInterface $eventDispatcher;   
+    protected $service;
 
     protected function setUp(): void
     {
@@ -27,6 +28,13 @@ class RegisterUserServiceTest extends TestCase
         $this->userRepository = $this->createMock(UserRepositoryInterface::class);
         $this->tokenService = $this->createMock(TokenServiceInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->service = new RegisterUserService(
+            userRepository: $this->userRepository,
+            eventDispatcher: $this->eventDispatcher,
+            tokenService: $this->tokenService,
+            logger: $this->logger
+        );
     }
 
     private function makeDTO(): RegisterUserDTO
@@ -54,27 +62,13 @@ class RegisterUserServiceTest extends TestCase
         );
     }
 
-    private function makeService(): RegisterUserService
-    {
-        return new RegisterUserService(
-            userRepository: $this->userRepository,
-            eventDispatcher: $this->eventDispatcher,
-            tokenService: $this->tokenService,
-            logger: $this->logger
-        );
-    }
-
-    /**
-     * A basic unit test example.
-     */
     public function test_register_returns_expected_structure(): void
     {
         $this->userRepository->method('create')->willReturn($this->makeUser());
         $this->tokenService->method('generateToken')->willReturn('test-token');
         $this->eventDispatcher->method('dispatch');
 
-        $service = $this->makeService();
-        $result = $service->execute($this->makeDTO());
+        $result = $this->service->execute($this->makeDTO());
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('user', $result);
@@ -102,8 +96,7 @@ class RegisterUserServiceTest extends TestCase
         $this->tokenService->method('generateToken')->willReturn('test-token');
         $this->eventDispatcher->method('dispatch');
 
-        $service = $this->makeService();    
-        $service->execute($dto);
+        $this->service->execute($dto);
     }
 
     public function test_register_generates_token_on_success(): void
@@ -119,8 +112,7 @@ class RegisterUserServiceTest extends TestCase
 
         $this->eventDispatcher->method('dispatch');
 
-        $service = $this->makeService();
-        $result = $service->execute($this->makeDTO());
+        $result = $this->service->execute($this->makeDTO());
 
         $this->assertEquals('test-token', $result['access_token']);
     }
@@ -134,7 +126,7 @@ class RegisterUserServiceTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(UserCreated::class)); 
 
-        $this->makeService()->execute($this->makeDTO());
+        $this->service->execute($this->makeDTO());
     }
 
     public function test_user_created_event_contains_correct_user(): void
@@ -150,8 +142,7 @@ class RegisterUserServiceTest extends TestCase
                 return $event instanceof UserCreated && $event->user->email === $user->email;
             }));
 
-        $service = $this->makeService();
-        $service->execute($this->makeDTO());
+        $this->service->execute($this->makeDTO());
 
     }
 
@@ -171,7 +162,6 @@ class RegisterUserServiceTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database error');    
 
-        $service = $this->makeService();
-        $service->execute($dto);
+        $this->service->execute($dto);
     }
 }
