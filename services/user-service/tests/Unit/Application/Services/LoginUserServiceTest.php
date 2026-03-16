@@ -11,14 +11,13 @@ use App\Domain\Exceptions\InvalidCredentialsException;
 use App\Domain\Exceptions\InactiveAccountException;
 use App\Domain\Entities\User;
 use PHPUnit\Framework\TestCase;
-// use Tests\TestCase;
 
 class LoginUserServiceTest extends TestCase
 {
-    private $userRepository;
-    private $tokenService;
-    private $logger;
-    private $service;
+    protected UserRepositoryInterface $userRepository;
+    protected TokenServiceInterface $tokenService;
+    protected LoggerInterface $logger;
+    protected $service;
 
     protected function setUp(): void
     {
@@ -35,20 +34,32 @@ class LoginUserServiceTest extends TestCase
         );
     }
 
-    public function testSuccessfulLogin()
+    private function makeDTO(): LoginUserDTO
     {
-        $password = 'secret123';
-
-        $user = new User(
+        return new LoginUserDTO(
             email: 'test@example.com',
+            password: 'secret123'
+        );
+    }
+
+    private function makeUser(string $password = 'secret123', bool $isActive = true): User
+    {
+        return new User(
+            id: 1,
+            name: 'Test User',
+            email: 'test@example.com',
+            phone: '1234567890',
             password: password_hash($password, PASSWORD_BCRYPT),
-            is_active: true
+            role: 'customer',
+            isActive: $isActive,
+            eloquentUser: null
         );
+    }
 
-        $dto = new LoginUserDTO(
-            email: 'test@example.com',
-            password: $password
-        );
+    public function test_login_returns_expected_structure()
+    {
+        $user = $this->makeUser();
+        $dto = $this->makeDTO();
 
         $this->userRepository
             ->method('findByEmail')
@@ -62,44 +73,53 @@ class LoginUserServiceTest extends TestCase
 
         $result = $this->service->execute($dto);
 
-        $this->assertEquals($user, $result['user']);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('user', $result);
+        $this->assertArrayHasKey('access_token', $result);
         $this->assertEquals('fake-token', $result['access_token']);
+        $this->assertNotEmpty($result['access_token']);
+        $this->assertNotEmpty($result['user']);
+        $this->assertInstanceOf(User::class, $result['user']);
+        $this->assertIsString($result['access_token']);
+        $this->assertEquals('Test User', $result['user']->name);
+        $this->assertEquals('1234567890', $result['user']->phone);
+        $this->assertEquals('test@example.com', $result['user']->email);
+        $this->assertEquals('customer', $result['user']->role);
     }
 
-    public function testInvalidCredentialsThrowsException()
+    public function test_login_generates_token_on_success(): void
     {
-        $dto = new LoginUserDTO(
-            email: 'wrong@example.com',
-            password: 'wrong-password'
-        );
+        $user = $this->makeUser();
+        $dto = $this->makeDTO();
 
-        $this->userRepository
-            ->method('findByEmail')
-            ->willReturn(null);
+        $this->userRepository->method('findByEmail')->willReturn($user);
+
+        $this->tokenService->expects($this->once())
+            ->method('generateToken')
+            ->with($user)
+            ->willReturn('fake-token');
+
+        $result = $this->service->execute($dto);
+
+        $this->assertEquals('fake-token', $result['access_token']);
+        
+    }
+
+    public function test_invalid_credentials_throws_exception()
+    {
+        $this->userRepository->method('findByEmail')->willReturn(null);
 
         $this->expectException(InvalidCredentialsException::class);
 
-        $this->service->execute($dto);
+        $this->service->execute($this->makeDTO());
     }
 
-    public function testInactiveAccountThrowsException()
+    public function test_inactive_account_throws_exception()
     {
-        $password = 'secret123';
+        $user = $this->makeUser(isActive: false);
+        $dto = $this->makeDTO();
 
-        $user = new User(
-            email: 'test@example.com',
-            password: password_hash($password, PASSWORD_BCRYPT),
-            is_active: false
-        );
-
-        $dto = new LoginUserDTO(
-            email: 'test@example.com',
-            password: $password
-        );
-
-        $this->userRepository
-            ->method('findByEmail')
-            ->willReturn($user);
+        $this->userRepository->method('findByEmail')->willReturn($user);
 
         $this->expectException(InactiveAccountException::class);
 
