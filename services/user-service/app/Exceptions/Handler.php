@@ -6,7 +6,6 @@ use App\Domain\Exceptions\InactiveAccountException;
 use App\Domain\Exceptions\InvalidCredentialsException;
 use App\Domain\Exceptions\UserAlreadyExistsException;
 use Exception;
-use Illuminate\Validation\Rules\In;
 use Throwable;
 
 class Handler extends Exception
