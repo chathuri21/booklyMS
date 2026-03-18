@@ -17,8 +17,7 @@ class UserCreatedTest extends TestCase
             phone: '1234567890',
             password: password_hash('password', PASSWORD_BCRYPT),
             role: 'customer',
-            isActive: true,
-            eloquentUser: null
+            isActive: true
         );
 
         $event = new UserCreated($user);

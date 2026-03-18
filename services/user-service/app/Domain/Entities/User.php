@@ -16,14 +16,8 @@ class User
         public string $phone,
         public string $password,
         public string $role,
-        public bool $isActive,
-        private ?EloquentUser $eloquentUser = null
+        public bool $isActive
     ) {}
-
-    public function getEloquentModel(): EloquentUser
-    {
-        return $this->eloquentUser;
-    }
 
     public function checkPassword(string $password) : void 
     {

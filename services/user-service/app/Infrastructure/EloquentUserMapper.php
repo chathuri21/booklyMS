@@ -16,8 +16,7 @@ class EloquentUserMapper
             phone: $eloquentUser->phone,
             password: $eloquentUser->password,
             role: $eloquentUser->role,
-            isActive: (bool) $eloquentUser->is_active,
-            eloquentUser: $eloquentUser
+            isActive: (bool) $eloquentUser->is_active
         );
     }
 

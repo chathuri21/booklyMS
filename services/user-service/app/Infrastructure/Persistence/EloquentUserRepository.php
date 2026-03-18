@@ -5,8 +5,8 @@ namespace App\Infrastructure\Persistence;
 use App\Domain\DTOs\RegisterUserDTO;
 use App\Domain\Entities\User as DomainUser;
 use App\Domain\Repositories\UserRepositoryInterface;
-use App\Models\User as EloquentUser;
 use App\Infrastructure\EloquentUserMapper;
+use App\Models\User as EloquentUser;
 use Illuminate\Support\Facades\Hash;
 
 class EloquentUserRepository implements UserRepositoryInterface
@@ -33,5 +33,10 @@ class EloquentUserRepository implements UserRepositoryInterface
         }
 
         return EloquentUserMapper::toDomain($eloquentUser);
+    }
+
+    public function getModelById(int $id) : ?EloquentUser
+    {
+        return EloquentUser::find($id) ?? null;
     }
 }
