@@ -4,7 +4,6 @@ namespace App\Application\Services;
 
 use App\Domain\DTOs\LoginUserDTO;
 use App\Domain\Exceptions\InvalidCredentialsException;
-use App\Domain\Exceptions\InactiveAccountException;
 use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\TokenServiceInterface;
 use App\Domain\Services\LoggerInterface;
