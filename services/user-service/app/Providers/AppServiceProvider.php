@@ -6,13 +6,12 @@ use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Services\EventDispatcherInterface;
 use App\Domain\Services\TokenServiceInterface;
 use App\Domain\Services\LoggerInterface;
+use App\Exceptions\Handler;
 use App\Infrastructure\Persistence\EloquentUserRepository;
 use App\Infrastructure\Events\LaravelEventDispatcher;   
 use App\Infrastructure\Auth\SanctumTokenService;
 use App\Infrastructure\Logging\LaravelLogger;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,9 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EventDispatcherInterface::class, LaravelEventDispatcher::class);
         $this->app->bind(TokenServiceInterface::class, SanctumTokenService::class);
         $this->app->bind(LoggerInterface::class, LaravelLogger::class);
-        // $this->app->singleton(LoggerInterface::class, function ($app) {
-        //     return $app->make('log');
-        // });
+        $this->app->bind(ExceptionHandler::class, Handler::class);
     }
 
     /**
