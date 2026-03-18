@@ -27,6 +27,7 @@ class UserTest extends TestCase
         $user = $this->makeUser();
 
         $user->checkPassword('password');
+        
         $this->assertTrue(true);
     }
 
@@ -44,6 +45,7 @@ class UserTest extends TestCase
         $user = $this->makeUser();
 
         $user->ensureIsActive();
+
         $this->assertTrue(true);
     }
 

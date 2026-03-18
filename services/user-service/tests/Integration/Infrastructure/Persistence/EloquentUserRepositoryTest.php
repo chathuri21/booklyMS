@@ -13,20 +13,32 @@ use Tests\TestCase;
 class EloquentUserRepositoryTest extends TestCase
 {
     use RefreshDatabase;
-    
-    public function test_create_user(): void
-    {
-        $repository = new EloquentUserRepository();
 
-        $dto = new RegisterUserDTO(
+    protected $repository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->repository = new EloquentUserRepository();
+    }
+
+    private function makeDTO(): RegisterUserDTO
+    {
+        return new RegisterUserDTO(
             name: 'Test User',
             email: 'test@example.com',
             phone: '1234567890',
             password: 'password',
             role: 'customer'
         );
+    }
+    
+    public function test_create_user(): void
+    {
+        $dto = $this->makeDTO();
 
-        $user = $repository->create($dto);
+        $user = $this->repository->create($dto);
 
         $this->assertNotNull($user);
         $this->assertEquals($dto->name, $user->name);
@@ -41,17 +53,9 @@ class EloquentUserRepositoryTest extends TestCase
 
     public function test_create_user_with_hashed_password() : void
     {
-        $repository = new EloquentUserRepository();
+        $dto = $this->makeDTO();
 
-        $dto = new RegisterUserDTO(
-            name: 'Test User',
-            email: 'test@example.com',
-            phone: '1234567890',
-            password: 'password',
-            role: 'customer'
-        );
-
-        $repository->create($dto);
+        $this->repository->create($dto);
 
         $eloquentUser = EloquentUser::where('email', 'test@example.com')->first();
 
@@ -64,9 +68,7 @@ class EloquentUserRepositoryTest extends TestCase
             'email' => 'test@example.com'
         ]);
 
-        $repository = new EloquentUserRepository();
-
-        $user = $repository->findByEmail('test@example.com');
+        $user = $this->repository->findByEmail('test@example.com');
 
         $this->assertNotNull($user);
         $this->assertEquals($eloquentUser->email, $user->email);
@@ -76,9 +78,8 @@ class EloquentUserRepositoryTest extends TestCase
 
     public function test_find_by_email_returns_null_when_user_not_found() : void
     {
-        $repository = new EloquentUserRepository();
 
-        $user = $repository->findByEmail('not-found@example.com');
+        $user = $this->repository->findByEmail('not-found@example.com');
 
         $this->assertNull($user);
     }
@@ -87,9 +88,7 @@ class EloquentUserRepositoryTest extends TestCase
     {
         $eloquentUser = EloquentUser::factory()->create();
 
-        $repository = new EloquentUserRepository();
-
-        $user = $repository->getModelById($eloquentUser->id);
+        $user = $this->repository->getModelById($eloquentUser->id);
 
         $this->assertNotNull($user);
         $this->assertEquals($eloquentUser->id, $user->id);
@@ -98,9 +97,7 @@ class EloquentUserRepositoryTest extends TestCase
 
     public function test_get_model_by_id_returns_null_when_user_not_found() : void
     {
-        $repository = new EloquentUserRepository();
-
-        $user = $repository->getModelById(99999);
+        $user = $this->repository->getModelById(99999);
 
         $this->assertNull($user);
     }

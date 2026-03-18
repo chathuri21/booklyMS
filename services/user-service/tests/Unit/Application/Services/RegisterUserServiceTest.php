@@ -105,7 +105,9 @@ class RegisterUserServiceTest extends TestCase
         $dto = $this->makeDTO();
         $user = $this->makeUser();
 
-        $this->userRepository->expects($this->once())->method('create')->willReturn($user);
+        $this->userRepository->expects($this->once())
+            ->method('create')
+            ->willReturn($user);
 
         $this->tokenService->expects($this->once())
             ->method('generateToken')
@@ -161,7 +163,6 @@ class RegisterUserServiceTest extends TestCase
             ->willThrowException(new \Exception('Database error')); 
         
         $this->tokenService->expects($this->never())->method('generateToken');
-
         $this->eventDispatcher->expects($this->never())->method('dispatch');
 
         $this->expectException(\Exception::class);
@@ -181,9 +182,7 @@ class RegisterUserServiceTest extends TestCase
             ->willReturn($existingUser);
             
         $this->userRepository->expects($this->never())->method('create');
-
         $this->tokenService->expects($this->never())->method('generateToken');
-
         $this->eventDispatcher->expects($this->never())->method('dispatch');
 
         $this->expectException(UserAlreadyExistsException::class);
