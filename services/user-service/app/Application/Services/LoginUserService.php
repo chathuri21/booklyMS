@@ -24,15 +24,13 @@ class LoginUserService
     {
         $user = $this->userRepository->findByEmail($dto->email);
 
-        if (!$user || !password_verify($dto->password, $user->password)) {
+        if (!$user) {
             $this->logger->info('Invalid login attempt for email: ' . $dto->email);
             throw new InvalidCredentialsException();
         }
 
-        if (!$user->isActive) {
-            $this->logger->info('Inactive account login attempt for email: ' . $dto->email);
-            throw new InactiveAccountException();
-        } 
+        $user->checkPassword($dto->password);
+        $user->ensureIsActive();
 
         $token = $this->tokenService->generateToken($user);
 
