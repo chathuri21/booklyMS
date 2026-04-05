@@ -42,5 +42,5 @@ jobs:
     - name: Run PHPStan
       run: vendor/bin/phpstan analyse app
     - name: Run tests
-      run: vphp artisan test
+      run: php artisan test
     
