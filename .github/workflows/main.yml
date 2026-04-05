@@ -20,8 +20,8 @@ jobs:
         # ini-values: post_max_size=256M, upload_max_filesize=256M
         # coverage: none
     - name: Create database
-      run: touch ./database/database.sqlite
-      # run: mysql -e "CREATE DATABASE user_service_test_db;"
+      # run: touch ./database/database.sqlite
+      run: mysql -e "CREATE DATABASE user_service_test_db;"
     - name: Copy .env 
       run: cp .env.test .env
     - name: Install app
