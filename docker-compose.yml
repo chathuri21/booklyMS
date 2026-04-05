@@ -1,0 +1,63 @@
+
+services:
+
+  user-service:
+    build: ./services/user-service
+    container_name: user_service
+    volumes:
+      - ./services/user-service:/var/www
+    ports:
+      - "8001:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    depends_on:
+      - mysql
+    networks:
+      - app
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user_service_db
+      MYSQL_USER: microservice_user
+      MYSQL_PASSWORD: StrongPassword123!
+    ports:
+      - "3307:3306"
+    networks:
+      - app
+    volumes:
+      - mysql_data:/var/lib/mysql 
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5673:5672"   # AMQP port
+      - "15673:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app
+    volumes:
+    - rabbitmq_data:/var/lib/rabbitmq
+
+  queue-worker:
+    build: ./services/user-service
+    container_name: queue_worker
+    volumes:
+      - ./services/user-service:/var/www
+    command: php artisan queue:work database --sleep=3 --tries=3
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - app
+
+networks:
+  app:
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
