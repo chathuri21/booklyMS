@@ -32,14 +32,14 @@ jobs:
     - name: Install app
       run: composer install
       # run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
-    - name: Set DB config for CI
-      run: |
-        php artisan config:clear
-        sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+    # - name: Set DB config for CI
+    #   run: |
+    #     php artisan config:clear
+    #     sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
     - name: Run migrations
       run: php artisan migrate:fresh --force
       # run: php artisan migrate --env=testing
-    - name: Run PHPStan
+    - name: ---Run PHPStan***
       run: vendor/bin/phpstan analyse app
     - name: Run tests
       run: php artisan test
