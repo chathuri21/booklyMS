@@ -37,10 +37,10 @@ jobs:
         php artisan config:clear
         sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
     - name: Run migrations
-      run: php artisan migrate
+      run: php artisan migrate:fresh --force
       # run: php artisan migrate --env=testing
     - name: Run PHPStan
       run: vendor/bin/phpstan analyse app
     - name: Run tests
-      run: vendor/bin/phpunit --configuration phpunit.xml
+      run: vphp artisan test
     
