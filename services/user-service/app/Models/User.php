@@ -53,14 +53,14 @@ class User extends Authenticatable
      */
     
     // If the user is a customer, they have many appointments
-    public function appointmentsAsCustomer()
-    {
-        return $this->hasMany(\App\Models\Appointment::class, 'user_id');
-    }
+    // public function appointmentsAsCustomer()
+    // {
+    //     return $this->hasMany(\App\Models\Appointment::class, 'user_id');
+    // }
 
-    // If the user is a provider, they have many appointments
-    public function appointmentsAsProvider()
-    {
-        return $this->hasMany(\App\Models\Appointment::class, 'provider_id');
-    }
+    // // If the user is a provider, they have many appointments
+    // public function appointmentsAsProvider()
+    // {
+    //     return $this->hasMany(\App\Models\Appointment::class, 'provider_id');
+    // }
 }
