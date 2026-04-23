@@ -39,7 +39,7 @@ jobs:
     - name: Run migrations
       run: php artisan migrate:fresh --force
       # run: php artisan migrate --env=testing
-    - name: ---Run PHPStan***
+    - name: Run PHPStan
       run: vendor/bin/phpstan analyse app
     - name: Run tests
       run: php artisan test
