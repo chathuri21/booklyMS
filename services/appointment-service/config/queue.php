@@ -108,12 +108,14 @@ return [
                     'name' => 'microservices.exchange',
                     'type' => 'topic',
                     'declare' => true,
+                    'user_events' => env('RABBITMQ_EXCHANGE_USER_EVENTS', 'user.events'),
                 ],
 
                 'queue' => [
                     'declare' => true,
                     'bind' => true,
                     'routing_key' => env('RABBITMQ_ROUTING_KEY', '#'),
+                    'appointment_user_events' => env('RABBITMQ_QUEUE_APPOINTMENT_EVENTS', 'appointment.user_events')
                 ],
             ],
         ],
