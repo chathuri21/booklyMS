@@ -14,6 +14,33 @@ services:
     networks:
       - app
 
+  appointment-service:
+    build: ./services/appointment-service
+    container_name: appointment_service
+    volumes:
+      - ./services/appointment-service:/var/www
+    ports:
+      - "8002:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - app
+
+  appointment-worker:
+    build: ./services/appointment-service
+    container_name: appointment_worker
+    volumes:
+      - ./services/appointment-service:/var/www
+    command: php artisan consume:user-events
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - app
+
   mysql:
     image: mysql:8
     container_name: mysql
@@ -41,7 +68,7 @@ services:
     networks:
       - app
     volumes:
-    - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
 
   queue-worker:
     build: ./services/user-service
