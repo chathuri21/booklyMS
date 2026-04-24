@@ -7,6 +7,22 @@ use Illuminate\Support\Facades\Log;
 
 class UserCreatedHandler
 {
+    /**
+     * Handle the user.created event.
+     *
+     * Expected payload shape:
+     * {
+     *   "event":      "user.created",
+     *   "data": {
+     *     "id":    1,
+     *     "name":  "Jane Doe",
+     *     "email": "jane@example.com",
+     *     "phone": "+49123456789",
+     *     "role": "customer",
+     *   "is_active": true
+     *   }
+     * }
+     */
     public function handle(array $eventData): void
     {
         UserSnapshot::updateOrCreate(

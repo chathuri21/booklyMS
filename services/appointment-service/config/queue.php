@@ -115,6 +115,7 @@ return [
                     'declare' => true,
                     'bind' => true,
                     'routing_key' => env('RABBITMQ_ROUTING_KEY', '#'),
+                    // Each service gets its own queue bound to the same exchange
                     'appointment_user_events' => env('RABBITMQ_QUEUE_APPOINTMENT_EVENTS', 'appointment.user_events')
                 ],
             ],
