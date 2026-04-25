@@ -17,11 +17,11 @@ class ConsumeUserEvents extends Command
         $this->info('Starting to consume user events...');   
 
         $connection = new AMQPStreamConnection(
-            config('queue.connections.rabbitmq.host'),
-            config('queue.connections.rabbitmq.port'),
-            config('queue.connections.rabbitmq.user'),
-            config('queue.connections.rabbitmq.password'),
-            config('queue.connections.rabbitmq.vhost')
+            config('queue.connections.rabbitmq.0.host'),
+            config('queue.connections.rabbitmq.0.port'),
+            config('queue.connections.rabbitmq.0.user'),
+            config('queue.connections.rabbitmq.0.password'),
+            config('queue.connections.rabbitmq.0.vhost')
         );
 
         // Exchange and queue names from config
