@@ -44,11 +44,8 @@ services:
   mysql:
     image: mysql:8
     container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: user_service_db
-      MYSQL_USER: microservice_user
-      MYSQL_PASSWORD: StrongPassword123!
+    env_file:
+      - ./docker/.env
     ports:
       - "3307:3306"
     networks:
@@ -63,9 +60,8 @@ services:
     ports:
       - "5673:5672"   # AMQP port
       - "15673:15672" # Management UI
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+    env_file:
+      - ./docker/.env
     networks:
       - app
     volumes:
