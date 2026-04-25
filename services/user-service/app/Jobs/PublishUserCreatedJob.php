@@ -34,7 +34,7 @@ class PublishUserCreatedJob implements ShouldQueue
 
         $channel = $connection->channel();
 
-        $exchange = config('queue.connections.rabbitmq.options.exchange.user_events', 'user.events');
+        $exchange = config('queue.connections.rabbitmq.options.exchange.user_events', 'user_events');
 
         $channel->exchange_declare($exchange, 'topic', false, true, false);
 
@@ -47,7 +47,7 @@ class PublishUserCreatedJob implements ShouldQueue
 
         $channel->close();
         $connection->close();
-        
+
         // Queue::connection('rabbitmq')->pushRaw($this->payload, 'user.created', [
         //     'delivery_mode' => 2, // Make message persistent
         // ]);
