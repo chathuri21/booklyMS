@@ -36,8 +36,10 @@ services:
     command: php artisan consume:user-events
     restart: unless-stopped
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - app
 
@@ -53,6 +55,12 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql 
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -66,6 +74,12 @@ services:
       - app
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   queue-worker:
     build: ./services/user-service
@@ -74,8 +88,10 @@ services:
       - ./services/user-service:/var/www
     command: php artisan queue:work database --sleep=3 --tries=3
     depends_on:
-      - mysql
-      - rabbitmq
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - app
 
