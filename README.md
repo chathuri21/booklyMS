@@ -16,6 +16,19 @@ Laravel-based microservices project for a simple booking/appointments domain.
 
 - Docker + Docker Compose
 
+### Configure Docker environment
+
+`docker-compose.yml` reads credentials from `docker/.env`.
+
+```bash
+cp docker/.env.example docker/.env
+```
+
+Fill in:
+
+- **MySQL**: `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`
+- **RabbitMQ**: `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`
+
 ### Start
 
 From the repo root:
@@ -35,16 +48,18 @@ This starts:
 - **Workers**:
   - `queue-worker` (user-service) runs `php artisan queue:work ...`
   - `appointment-worker` (appointment-service) runs `php artisan consume:user-events`
+  - Workers wait for **healthy** MySQL/RabbitMQ (Compose `healthcheck` + `depends_on.condition`)
 
 ### Database credentials (Docker)
 
-The `mysql` container is configured as:
+The `mysql` container uses values from `docker/.env`:
 
 - **host**: `mysql` (from other containers) / `127.0.0.1` (from your machine)
 - **port**: `3306` (containers) / `3307` (your machine)
-- **username**: `microservice_user`
-- **password**: `StrongPassword123!`
-- **databases**: `user_service_db`, `appointment_service_db` (created by `docker/mysql/init.sql`)
+- **username**: `MYSQL_USER`
+- **password**: `MYSQL_PASSWORD`
+- **default database**: `MYSQL_DATABASE`
+- **databases created on init**: `user_service_db`, `appointment_service_db` (from `docker/mysql/init.sql`)
 
 ### Configure each service `.env`
 
@@ -64,8 +79,8 @@ DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
 DB_DATABASE=user_service_db   # or appointment_service_db
-DB_USERNAME=microservice_user
-DB_PASSWORD=StrongPassword123!
+DB_USERNAME=${MYSQL_USER}
+DB_PASSWORD=${MYSQL_PASSWORD}
 ```
 
 Run migrations inside the container (example for user-service):
@@ -103,15 +118,30 @@ Defined in `api-gateway/routes/api.php`:
 
 ```text
 .
+├─ Makefile
 ├─ api-gateway/
 ├─ services/
 │  ├─ user-service/
 │  ├─ appointment-service/
 │  └─ notification-service/
 ├─ docker/
+│  ├─ .env
+│  ├─ .env.example
 │  ├─ mysql/
 │  └─ nginx/
 └─ docker-compose.yml
+```
+
+## Useful Makefile commands
+
+From the repo root:
+
+```bash
+make up
+make ps
+make migrate
+make fresh
+make down
 ```
 
 ## Notes
