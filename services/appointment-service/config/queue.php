@@ -108,7 +108,7 @@ return [
                     'name' => 'microservices.exchange',
                     'type' => 'topic',
                     'declare' => true,
-                    'user_events' => env('RABBITMQ_EXCHANGE_USER_EVENTS', 'user.events'),
+                    'user_events' => env('RABBITMQ_EXCHANGE_USER_EVENTS', 'user_events'),
                 ],
 
                 'queue' => [
