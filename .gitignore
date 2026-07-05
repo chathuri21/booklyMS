@@ -1,0 +1,5 @@
+# Secrets — real credentials live only on the machine running compose
+docker/.env
+
+# macOS
+.DS_Store
