@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Internal Microservices
+    |--------------------------------------------------------------------------
+    */
+
+    'user_service' => [
+        'url' => env('USER_SERVICE_URL', 'http://user-service:8000'),
+    ],
+
+    'appointment_service' => [
+        'url' => env('APPOINTMENT_SERVICE_URL', 'http://appointment-service:8000'),
+    ],
+
 ];
