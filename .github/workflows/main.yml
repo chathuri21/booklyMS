@@ -73,6 +73,8 @@ jobs:
             path: services/user-service
           - name: appointment-service
             path: services/appointment-service
+          - name: notification-service
+            path: services/notification-service
 
     steps:
     - name: Checkout code
