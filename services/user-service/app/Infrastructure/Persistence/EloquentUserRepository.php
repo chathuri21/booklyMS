@@ -19,6 +19,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             'phone' => $dto->phone,
             'password' => Hash::make($dto->password),
             'role' => $dto->role,
+            // Set explicitly: relying on the DB column default leaves the
+            // in-memory model without a value, which the mapper casts to false
+            'is_active' => true,
         ]);
 
         return EloquentUserMapper::toDomain($eloquentUser);
