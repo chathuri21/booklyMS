@@ -43,6 +43,21 @@ services:
     networks:
       - app
 
+  notification-worker:
+    build: ./services/notification-service
+    container_name: notification_worker
+    volumes:
+      - ./services/notification-service:/var/www
+    command: php artisan consume:user-events
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - app
+
   mysql:
     image: mysql:8
     container_name: mysql
