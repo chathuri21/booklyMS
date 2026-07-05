@@ -5,62 +5,83 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Models\Appointment;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List the authenticated user's appointments (as customer or provider).
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $userId = (int) $request->header('X-User-Id');
+
+        $appointments = Appointment::where('user_id', $userId)
+            ->orWhere('provider_id', $userId)
+            ->orderBy('start_at')
+            ->get();
+
+        return response()->json(['data' => $appointments]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Book a new appointment for the authenticated user.
      */
     public function store(StoreAppointmentRequest $request)
     {
-        //
+        $appointment = Appointment::create([
+            ...$request->validated(),
+            'user_id' => (int) $request->header('X-User-Id'),
+            'status' => 'scheduled',
+        ]);
+
+        return response()->json([
+            'message' => 'Appointment created successfully',
+            'data' => $appointment,
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Update an appointment owned by the authenticated user.
      */
-    public function show(Appointment $appointment)
+    public function update(UpdateAppointmentRequest $request, int $id)
     {
-        //
+        $appointment = $this->findOwned($request, $id);
+
+        if (!$appointment) {
+            return response()->json(['message' => 'Appointment not found.'], 404);
+        }
+
+        $appointment->update($request->validated());
+
+        return response()->json([
+            'message' => 'Appointment updated successfully',
+            'data' => $appointment,
+        ]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Cancel (soft delete) an appointment owned by the authenticated user.
      */
-    public function edit(Appointment $appointment)
+    public function destroy(Request $request, int $id)
     {
-        //
+        $appointment = $this->findOwned($request, $id);
+
+        if (!$appointment) {
+            return response()->json(['message' => 'Appointment not found.'], 404);
+        }
+
+        $appointment->delete();
+
+        return response()->json(['message' => 'Appointment deleted successfully']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
+    private function findOwned(Request $request, int $id): ?Appointment
     {
-        //
-    }
+        $userId = (int) $request->header('X-User-Id');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Appointment $appointment)
-    {
-        //
+        return Appointment::where('id', $id)
+            ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('provider_id', $userId))
+            ->first();
     }
 }

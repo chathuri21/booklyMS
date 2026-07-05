@@ -11,7 +11,8 @@ class UpdateAppointmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Identity is asserted by the gateway (auth.gateway middleware)
+        return true;
     }
 
     /**
@@ -22,7 +23,11 @@ class UpdateAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['sometimes', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'start_at' => ['sometimes', 'date'],
+            'end_at' => ['nullable', 'date', 'after:start_at'],
+            'status' => ['sometimes', 'in:scheduled,cancelled,completed'],
         ];
     }
 }

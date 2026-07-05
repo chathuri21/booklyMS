@@ -11,7 +11,8 @@ class StoreAppointmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Identity is asserted by the gateway (auth.gateway middleware)
+        return true;
     }
 
     /**
@@ -22,7 +23,11 @@ class StoreAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['required', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'start_at' => ['required', 'date', 'after:now'],
+            'end_at' => ['nullable', 'date', 'after:start_at'],
+            'provider_id' => ['nullable', 'integer', 'exists:user_snapshots,user_id'],
         ];
     }
 }
