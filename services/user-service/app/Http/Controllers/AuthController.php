@@ -10,6 +10,7 @@ use App\Domain\DTOs\RegisterUserDTO;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -37,6 +38,15 @@ class AuthController extends Controller
                 'user' => new UserResource($result['user']),
                 'access_token' => $result['access_token'],
                 'token_type' => 'Bearer'
+            ]
+        ], 200);
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json([
+            'data' => [
+                'user' => new UserResource($request->user()),
             ]
         ], 200);
     }
