@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthenticateJwt
 {
     public function handle(Request $request, Closure $next): Response
-    {dd('ll');
+    {
         $token = $request->bearerToken();
 
         if (!$token) {
