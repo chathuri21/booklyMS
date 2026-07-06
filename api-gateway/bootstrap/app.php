@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'auth.user-service' => \App\Http\Middleware\AuthenticateViaUserService::class,
+            'auth.jwt' => \App\Http\Middleware\AuthenticateJwt::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

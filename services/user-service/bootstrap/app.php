@@ -30,6 +30,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api();
 
+        $middleware->alias([
+            'auth.jwt' => \App\Http\Middleware\AuthenticateJwt::class,
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

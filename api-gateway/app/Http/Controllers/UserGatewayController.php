@@ -19,7 +19,12 @@ class UserGatewayController extends Controller
 
     public function me(Request $request)
     {
-        return $this->forward('get', '/api/me', $request);
+        // Answered straight from the verified JWT claims - no downstream call
+        return response()->json([
+            'data' => [
+                'user' => $request->attributes->get('gateway_user'),
+            ],
+        ]);
     }
 
     private function forward(string $method, string $path, Request $request)

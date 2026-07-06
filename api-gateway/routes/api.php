@@ -8,9 +8,9 @@ use App\Http\Controllers\AppointmentGatewayController;
 Route::post('/register', [UserGatewayController::class, 'register']);
 Route::post('/login', [UserGatewayController::class, 'login']);
 
-// Authenticated: gateway validates the token with user-service, then
+// Authenticated: gateway verifies the JWT signature locally, then
 // forwards trusted X-User-Id / X-User-Role headers downstream
-Route::middleware('auth.user-service')->group(function () {
+Route::middleware('auth.jwt')->group(function () {
     Route::get('/me', [UserGatewayController::class, 'me']);
 
     Route::get('/appointments', [AppointmentGatewayController::class, 'index']);
