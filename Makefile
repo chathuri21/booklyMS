@@ -1,10 +1,12 @@
 migrate:
 	docker exec -it user_service php artisan migrate
 	docker exec -it appointment_service php artisan migrate
+	docker exec -it notification_worker php artisan migrate
 
 fresh:
 	docker exec -it user_service php artisan migrate:fresh
 	docker exec -it appointment_service php artisan migrate:fresh
+	docker exec -it notification_worker php artisan migrate:fresh
 
 up:
 	docker compose up -d
